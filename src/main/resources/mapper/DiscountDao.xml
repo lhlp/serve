@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.shopserve.dao.DiscountDao">
+
+    <resultMap type="com.example.shopserve.entity.Discount" id="DiscountMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="disc" column="disc" jdbcType="VARCHAR"/>
+        <result property="shopid" column="shopId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="DiscountMap">
+        select id,
+               name,
+               disc,
+               shopId
+        from discount
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="DiscountMap">
+        select
+        id, name, disc, shopId
+        from discount
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="disc != null and disc != ''">
+                and disc = #{disc}
+            </if>
+            <if test="shopid != null">
+                and shopId = #{shopid}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from discount
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="disc != null and disc != ''">
+                and disc = #{disc}
+            </if>
+            <if test="shopid != null">
+                and shopId = #{shopid}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into discount(name, disc, shopId)
+        values (#{name}, #{disc}, #{shopid})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into discount(name, disc, shopId)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name}, #{entity.disc}, #{entity.shopid})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into discount(name, disc, shopId)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name}, #{entity.disc}, #{entity.shopid})
+        </foreach>
+        on duplicate key update
+        name = values(name),
+        disc = values(disc),
+        shopId = values(shopId)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update discount
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="disc != null and disc != ''">
+                disc = #{disc},
+            </if>
+            <if test="shopid != null">
+                shopId = #{shopid},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from discount
+        where id = #{id}
+    </delete>
+
+</mapper>
+
